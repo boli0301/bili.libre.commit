@@ -1,9 +1,8 @@
-package icu.freedomIntrovert.biliSendCommAntifraud.comment;
+package icu.freedomIntrovert.biliSendCommAntifraud;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
-
-import icu.freedomIntrovert.biliSendCommAntifraud.VoidDialogInterfaceOnClickListener;
 
 public class DialogUtil {
     public static void dialogMessage(Context context, String title, String message) {
@@ -14,5 +13,15 @@ public class DialogUtil {
             dialogBuilder.setTitle(title);
         }
         dialogBuilder.show();
+    }
+
+    public static ProgressDialog newProgressDialog(Context context,String title,String message){
+        ProgressDialog progressDialog = new ProgressDialog(context);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setMessage(message);
+        if (title != null) {
+            progressDialog.setTitle(title);
+        }
+        return progressDialog;
     }
 }

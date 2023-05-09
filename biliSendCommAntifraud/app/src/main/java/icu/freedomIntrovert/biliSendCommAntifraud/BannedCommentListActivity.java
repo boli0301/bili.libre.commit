@@ -1,10 +1,5 @@
 package icu.freedomIntrovert.biliSendCommAntifraud;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +7,11 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
@@ -28,17 +28,17 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import icu.freedomIntrovert.biliSendCommAntifraud.comment.StatisticsDBOpenHelper;
-import icu.freedomIntrovert.biliSendCommAntifraud.comment.bean.BandCommentBean;
+import icu.freedomIntrovert.biliSendCommAntifraud.comment.bean.BannedCommentBean;
+import icu.freedomIntrovert.biliSendCommAntifraud.db.StatisticsDBOpenHelper;
 
-public class BandCommentListActivity extends AppCompatActivity {
+public class BannedCommentListActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_IMPORT = 1;
     RecyclerView recyclerView;
     Context context;
     StatisticsDBOpenHelper statisticsDBOpenHelper;
     public static final int REQUEST_CODE_EXPORT = 2;
-    ArrayList<BandCommentBean> bandCommentBeanArrayList;
-    BandCommentListAdapter bannedCommentListAdapter;
+    ArrayList<BannedCommentBean> bandCommentBeanArrayList;
+    BannedCommentListAdapter bannedCommentListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,13 +48,13 @@ public class BandCommentListActivity extends AppCompatActivity {
         statisticsDBOpenHelper = new StatisticsDBOpenHelper(context);
         recyclerView = findViewById(R.id.rv_band_comment);
         /*
-        ArrayList<BandCommentBean> bandCommentBeanArrayList = new ArrayList<>();
-        bandCommentBeanArrayList.add(new BandCommentBean("00000","BV1GJ411x7h7","这是一条评论",BandCommentBean.BAND_TYPE_SHADOW_BAN,BandCommentBean.AREA_VIDEO,new Date()));
-        bandCommentBeanArrayList.add(new BandCommentBean("00000","BV1GJ411x7h7","这是一条评论",BandCommentBean.BAND_TYPE_QUICK_DELETE,BandCommentBean.AREA_VIDEO,new Date()));
-        bandCommentBeanArrayList.add(new BandCommentBean("00000","BV1GJ411x7h7","这是一条评论",BandCommentBean.BAND_TYPE_SENSITIVE,BandCommentBean.AREA_VIDEO,new Date()));
+        ArrayList<BannedCommentBean> bandCommentBeanArrayList = new ArrayList<>();
+        bandCommentBeanArrayList.add(new BannedCommentBean("00000","BV1GJ411x7h7","这是一条评论",BannedCommentBean.BAND_TYPE_SHADOW_BAN,BannedCommentBean.AREA_VIDEO,new Date()));
+        bandCommentBeanArrayList.add(new BannedCommentBean("00000","BV1GJ411x7h7","这是一条评论",BannedCommentBean.BAND_TYPE_QUICK_DELETE,BannedCommentBean.AREA_VIDEO,new Date()));
+        bandCommentBeanArrayList.add(new BannedCommentBean("00000","BV1GJ411x7h7","这是一条评论",BannedCommentBean.BAND_TYPE_SENSITIVE,BannedCommentBean.AREA_VIDEO,new Date()));
         */
         bandCommentBeanArrayList = statisticsDBOpenHelper.queryAllBandComments();
-        bannedCommentListAdapter = new BandCommentListAdapter(bandCommentBeanArrayList, context);
+        bannedCommentListAdapter = new BannedCommentListAdapter(bandCommentBeanArrayList, context);
         recyclerView.setAdapter(bannedCommentListAdapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
@@ -96,6 +96,7 @@ public class BandCommentListActivity extends AppCompatActivity {
                 ProgressDialog progressDialog = new ProgressDialog(context);
                 progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 progressDialog.setMessage("保存文件中");
+                progressDialog.setCancelable(false);
                 progressDialog.show();
                 new Thread(new Runnable() {
                     @Override
@@ -107,7 +108,7 @@ public class BandCommentListActivity extends AppCompatActivity {
                                 String[] csvHeader = new String[]{"rpid", "oid", "sourceId", "comment", "bannedType", "commentAreaType", "checkedArea", "date"};
                                 csvData.add(csvHeader);
                                 Collections.reverse(bandCommentBeanArrayList);
-                                for (BandCommentBean commentBean : bandCommentBeanArrayList) {
+                                for (BannedCommentBean commentBean : bandCommentBeanArrayList) {
                                     csvData.add(commentBean.toCSVStringArray());
                                 }
                                 Collections.reverse(bandCommentBeanArrayList);
@@ -143,7 +144,7 @@ public class BandCommentListActivity extends AppCompatActivity {
                 executor.execute(new Runnable() {
                     @Override
                     public void run() {
-                        List<BandCommentBean> bannedCommentBeans = new ArrayList<>();
+                        List<BannedCommentBean> bannedCommentBeans = new ArrayList<>();
                         if (data != null) {
                             try (InputStreamReader inputStreamReader = new InputStreamReader(context.getContentResolver().openInputStream(data.getData()));
                                  CSVReader csvReader = new CSVReader(inputStreamReader);
@@ -155,7 +156,7 @@ public class BandCommentListActivity extends AppCompatActivity {
                                 if ((csvLine = csvReader.readNext()) != null) {
                                     if (Arrays.equals(fileds, csvLine)) {
                                         while ((csvLine = csvReader.readNext()) != null) {
-                                            BandCommentBean bannedCommentBean = new BandCommentBean(csvLine[0], csvLine[1], csvLine[2], csvLine[3], csvLine[4], csvLine[5], csvLine[6], csvLine[7]);
+                                            BannedCommentBean bannedCommentBean = new BannedCommentBean(csvLine[0], Long.parseLong(csvLine[1]), csvLine[2], csvLine[3], csvLine[4], csvLine[5], csvLine[6], csvLine[7]);
                                             System.out.println(bannedCommentBean);
                                             if (statisticsDBOpenHelper.insertBannedComment(bannedCommentBean) > 0){
                                                 bannedCommentBeans.add(bannedCommentBean);
@@ -201,5 +202,7 @@ public class BandCommentListActivity extends AppCompatActivity {
             }
 
     }
+
+
 
 }

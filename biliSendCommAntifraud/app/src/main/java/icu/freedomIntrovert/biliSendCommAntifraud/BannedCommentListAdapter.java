@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -19,17 +18,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import icu.freedomIntrovert.biliSendCommAntifraud.comment.StatisticsDBOpenHelper;
-import icu.freedomIntrovert.biliSendCommAntifraud.comment.bean.BandCommentBean;
+import icu.freedomIntrovert.biliSendCommAntifraud.comment.bean.BannedCommentBean;
 import icu.freedomIntrovert.biliSendCommAntifraud.comment.bean.CommentArea;
+import icu.freedomIntrovert.biliSendCommAntifraud.db.StatisticsDBOpenHelper;
 
-public class BandCommentListAdapter extends RecyclerView.Adapter<BandCommentListAdapter.ViewHolder> {
+public class BannedCommentListAdapter extends RecyclerView.Adapter<BannedCommentListAdapter.ViewHolder> {
 
-    ArrayList<BandCommentBean> bandCommentBeanArrayList;
+    ArrayList<BannedCommentBean> bandCommentBeanArrayList;
     Context context;
     StatisticsDBOpenHelper statisticsDBOpenHelper;
 
-    public BandCommentListAdapter(ArrayList<BandCommentBean> bandCommentBeanArrayList, Context context) {
+    public BannedCommentListAdapter(ArrayList<BannedCommentBean> bandCommentBeanArrayList, Context context) {
         this.bandCommentBeanArrayList = bandCommentBeanArrayList;
         Collections.reverse(this.bandCommentBeanArrayList);
         this.context = context;
@@ -47,39 +46,38 @@ public class BandCommentListAdapter extends RecyclerView.Adapter<BandCommentList
     @SuppressLint("UseCompatLoadingForDrawables")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        BandCommentBean bandCommentBean = bandCommentBeanArrayList.get(position);
+        BannedCommentBean bandCommentBean = bandCommentBeanArrayList.get(position);
 
         holder.txv_info.setText(bandCommentBean.commentArea.sourceId);
         switch (bandCommentBean.checkedArea) {
-            case BandCommentBean.CHECKED_NO_CHECK:
+            case BannedCommentBean.CHECKED_NO_CHECK:
                 holder.txv_info.setTextColor(context.getResources().getColor(R.color.GRAY));
                 break;
-            case BandCommentBean.CHECKED_NOT_MARTIAL_LAW:
+            case BannedCommentBean.CHECKED_NOT_MARTIAL_LAW:
                 holder.txv_info.setTextColor(context.getResources().getColor(R.color.blue));
                 break;
-            case BandCommentBean.CHECKED_ONLY_BANNED_IN_THIS_AREA:
+            case BannedCommentBean.CHECKED_ONLY_BANNED_IN_THIS_AREA:
                 holder.txv_info.setTextColor(context.getResources().getColor(R.color.red));
                 break;
-            case BandCommentBean.CHECKED_NOT_ONLY_BANNED_IN_THIS_AREA:
+            case BannedCommentBean.CHECKED_NOT_ONLY_BANNED_IN_THIS_AREA:
                 holder.txv_info.setTextColor(context.getResources().getColor(R.color.green));
                 break;
         }
         holder.txv_comment.setText(bandCommentBean.comment);
-        Log.d("yellow", holder.txv_info.getText().toString() + " " + holder.txv_info.getCurrentTextColor() + "" + holder);
         switch (bandCommentBean.bannedType) {
-            case BandCommentBean.BANNED_TYPE_SHADOW_BAN:
+            case BannedCommentBean.BANNED_TYPE_SHADOW_BAN:
                 holder.imgv_band_type.setImageDrawable(context.getDrawable(R.drawable.hide));
                 holder.txv_band_type.setText("仅自己可见");
                 break;
-            case BandCommentBean.BANNED_TYPE_QUICK_DELETE:
+            case BannedCommentBean.BANNED_TYPE_QUICK_DELETE:
                 holder.imgv_band_type.setImageDrawable(context.getDrawable(R.drawable.deleted));
                 holder.txv_band_type.setText("被系统秒删");
                 break;
-            case BandCommentBean.BANNED_TYPE_SENSITIVE:
+            case BannedCommentBean.BANNED_TYPE_SENSITIVE:
                 holder.imgv_band_type.setImageDrawable(context.getDrawable(R.drawable.sensitive));
                 holder.txv_band_type.setText("包含敏感词");
                 break;
-            case BandCommentBean.BANNED_TYPE_UNKNOWN:
+            case BannedCommentBean.BANNED_TYPE_UNKNOWN:
                 holder.imgv_band_type.setImageDrawable(context.getDrawable(R.drawable.unknown));
                 holder.txv_band_type.setText("未知");
                 break;
@@ -102,44 +100,44 @@ public class BandCommentListAdapter extends RecyclerView.Adapter<BandCommentList
             TextView txv_send_date = dialogView.findViewById(R.id.txv_send_date);
             TextView txv_checkedArea = dialogView.findViewById(R.id.txv_checked_area);
             txv_comment_content.setText(bandCommentBean.comment);
-            txv_oid.setText(bandCommentBean.commentArea.oid);
+            txv_oid.setText(String.valueOf(bandCommentBean.commentArea.oid));
             txv_source_id.setText(bandCommentBean.commentArea.sourceId);
             switch (bandCommentBean.bannedType) {
-                case BandCommentBean.BANNED_TYPE_SHADOW_BAN:
+                case BannedCommentBean.BANNED_TYPE_SHADOW_BAN:
                     txv_band_type.setText("仅自己可见");
                     break;
-                case BandCommentBean.BANNED_TYPE_QUICK_DELETE:
+                case BannedCommentBean.BANNED_TYPE_QUICK_DELETE:
                     txv_band_type.setText("被系统秒删");
                     break;
-                case BandCommentBean.BANNED_TYPE_SENSITIVE:
+                case BannedCommentBean.BANNED_TYPE_SENSITIVE:
                     txv_band_type.setText("包含敏感词");
                     break;
-                case BandCommentBean.BANNED_TYPE_UNKNOWN:
+                case BannedCommentBean.BANNED_TYPE_UNKNOWN:
                     txv_band_type.setText("未知（直接去申诉等无法得知具体状态）");
             }
             switch (bandCommentBean.commentArea.areaType) {
                 case CommentArea.AREA_TYPE_VIDEO:
-                    txv_area_type.setText("视频");
+                    txv_area_type.setText("视频(type="+bandCommentBean.commentArea.areaType+")");
                     break;
                 case CommentArea.AREA_TYPE_ARTICLE:
-                    txv_area_type.setText("专栏");
+                    txv_area_type.setText("专栏(type="+bandCommentBean.commentArea.areaType+")");
                     break;
                 case CommentArea.AREA_TYPE_DYNAMIC11:
                 case CommentArea.AREA_TYPE_DYNAMIC17:
-                    txv_area_type.setText("动态");
+                    txv_area_type.setText("动态(type="+bandCommentBean.commentArea.areaType+")");
                     break;
             }
             switch (bandCommentBean.checkedArea) {
-                case BandCommentBean.CHECKED_NO_CHECK:
+                case BannedCommentBean.CHECKED_NO_CHECK:
                     txv_checkedArea.setText("未检查");
                     break;
-                case BandCommentBean.CHECKED_NOT_MARTIAL_LAW:
+                case BannedCommentBean.CHECKED_NOT_MARTIAL_LAW:
                     txv_checkedArea.setText("只检查过未戒严");
                     break;
-                case BandCommentBean.CHECKED_ONLY_BANNED_IN_THIS_AREA:
+                case BannedCommentBean.CHECKED_ONLY_BANNED_IN_THIS_AREA:
                     txv_checkedArea.setText("仅在在此评论区被ban");
                     break;
-                case BandCommentBean.CHECKED_NOT_ONLY_BANNED_IN_THIS_AREA:
+                case BannedCommentBean.CHECKED_NOT_ONLY_BANNED_IN_THIS_AREA:
                     txv_checkedArea.setText("评论区一切正常，该评论在任何评论区都被ban");
                     break;
             }
@@ -161,7 +159,7 @@ public class BandCommentListAdapter extends RecyclerView.Adapter<BandCommentList
                         new AlertDialog.Builder(context).setMessage("确认删除吗？")
                                 .setNegativeButton("手滑了", new VoidDialogInterfaceOnClickListener())
                                 .setPositiveButton("确认", (dialog14, which2) -> {
-                                    if (statisticsDBOpenHelper.deleteBandComment(bandCommentBean.rpid) != 0) {
+                                    if (statisticsDBOpenHelper.deleteBannedComment(bandCommentBean.rpid) != 0) {
                                         bandCommentBeanArrayList.remove(holder.getAdapterPosition());
                                         notifyItemRemoved(holder.getAdapterPosition());
                                         Toast.makeText(context, "删除成功", Toast.LENGTH_SHORT).show();
@@ -178,7 +176,7 @@ public class BandCommentListAdapter extends RecyclerView.Adapter<BandCommentList
         return bandCommentBeanArrayList.size();
     }
 
-    public void addData(List<BandCommentBean> bannedCommentBeans) {
+    public void addData(List<BannedCommentBean> bannedCommentBeans) {
         Collections.reverse(bannedCommentBeans);
         bandCommentBeanArrayList.addAll(0,bannedCommentBeans);
         notifyDataSetChanged();

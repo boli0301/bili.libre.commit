@@ -3,7 +3,7 @@ package icu.freedomIntrovert.biliSendCommAntifraud.comment.bean;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class BandCommentBean{
+public class BannedCommentBean {
     public static final String BANNED_TYPE_SHADOW_BAN = "shadowBan";
     public static final String BANNED_TYPE_QUICK_DELETE = "quickDelete";
     public static final String BANNED_TYPE_SENSITIVE = "sensitive";
@@ -23,7 +23,7 @@ public class BandCommentBean{
     public int checkedArea;
     public Date date;
 
-    public BandCommentBean(CommentArea commentArea, String rpid, String comment, String bandType, Date date, int checkedArea) {
+    public BannedCommentBean(CommentArea commentArea, String rpid, String comment, String bandType, Date date, int checkedArea) {
         this.commentArea = commentArea;
         this.rpid = rpid;
         this.comment = comment;
@@ -32,7 +32,7 @@ public class BandCommentBean{
         this.date = date;
     }
 
-    public BandCommentBean(String rpid,String oid,String sourceId,String comment,String bannedType,String commentAreaType,String checkedArea,String date){
+    public BannedCommentBean(String rpid, long oid, String sourceId, String comment, String bannedType, String commentAreaType, String checkedArea, String date){
         this.commentArea = new CommentArea(oid, sourceId, Integer.parseInt(commentAreaType));
         this.rpid = rpid;
         this.comment = comment;
@@ -41,7 +41,7 @@ public class BandCommentBean{
         this.date = new Date(Long.parseLong(date));
     }
 
-    public BandCommentBean(CommentArea commentArea, long rpid, String comment, String bannedType, Date date, int checkedArea) {
+    public BannedCommentBean(CommentArea commentArea, long rpid, String comment, String bannedType, Date date, int checkedArea) {
         this(commentArea,String.valueOf(rpid),comment,bannedType,date,checkedArea);
     }
 
@@ -61,7 +61,7 @@ public class BandCommentBean{
 
     @Override
     public String toString() {
-        return "BandCommentBean{" +
+        return "BannedCommentBean{" +
                 "commentArea=" + commentArea +
                 ", rpid='" + rpid + '\'' +
                 ", comment='" + comment + '\'' +
@@ -72,7 +72,7 @@ public class BandCommentBean{
     }
 
     public String[] toCSVStringArray() {
-        return new String[]{rpid, commentArea.oid, commentArea.sourceId, comment, bannedType, String.valueOf(commentArea.areaType), String.valueOf(checkedArea), String.valueOf(getTimeStampDate())};
+        return new String[]{rpid, String.valueOf(commentArea.oid), commentArea.sourceId, comment, bannedType, String.valueOf(commentArea.areaType), String.valueOf(checkedArea), String.valueOf(getTimeStampDate())};
     }
 
 
